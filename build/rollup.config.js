@@ -12,7 +12,7 @@ export default [
         output: [
             {
                 format: 'esm',
-				file: 'dist/adapter.js',
+				file: 'dist/index.js',
 				indent: '\t'
             }
         ]

@@ -2,7 +2,7 @@
   "name": "miniapp-adapter",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.6.4",
