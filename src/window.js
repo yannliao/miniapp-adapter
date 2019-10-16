@@ -1,5 +1,8 @@
 import Canvas from './Canvas'
 import { _canvas } from './Canvas'
+import { noop } from './util/index'
+
+
 export document from './document'
 export navigator from './navigator'
 export XMLHttpRequest from './XMLHttpRequest'
@@ -16,6 +19,23 @@ export * from './constructor'
 // 暴露全局的 canvas
 export { _canvas as canvas }
 export { Canvas }
+
+function addEventListener(type, listener) {
+    document.addEventListener(type, listener)
+}
+function removeEventListener(type, listener) {
+    document.removeEventListener(type, listener)
+}
+
+export { addEventListener }
+export { removeEventListener }
+//TODO
+let AudioContext = null
+let webkitAudioContext = null
+export { AudioContext }
+export { webkitAudioContext }
+export { noop as VRFrameData }
+
 // export { setTimeout }
 // export { setInterval }
 // export { clearTimeout }

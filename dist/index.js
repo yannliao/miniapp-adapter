@@ -1,12 +1,17 @@
 var window = /*#__PURE__*/Object.freeze({
 	__proto__: null,
-	get document () { return document; },
+	get document () { return document$1; },
 	get navigator () { return navigator; },
 	get XMLHttpRequest () { return XMLHttpRequest; },
 	get HTMLElement () { return HTMLElement; },
 	get location () { return location; },
 	get canvas () { return _canvas; },
 	get Canvas () { return Canvas; },
+	get addEventListener () { return addEventListener; },
+	get removeEventListener () { return removeEventListener; },
+	get AudioContext () { return AudioContext; },
+	get webkitAudioContext () { return webkitAudioContext; },
+	get VRFrameData () { return noop; },
 	get innerWidth () { return innerWidth; },
 	get innerHeight () { return innerHeight; },
 	get devicePixelRatio () { return devicePixelRatio; },
@@ -586,7 +591,7 @@ function (_HTMLAudioElement) {
 }(HTMLAudioElement);
 
 var events = {};
-var document = {
+var document$1 = {
   readyState: 'complete',
   visibilityState: 'visible',
   documentElement: window,
@@ -618,9 +623,9 @@ var document = {
   },
   getElementsByTagName: function getElementsByTagName(tagName) {
     if (tagName === 'head') {
-      return [document.head];
+      return [document$1.head];
     } else if (tagName === 'body') {
-      return [document.body];
+      return [document$1.body];
     } else if (tagName === 'canvas') {
       return [_canvas];
     }
@@ -629,9 +634,9 @@ var document = {
   },
   getElementsByName: function getElementsByName(tagName) {
     if (tagName === 'head') {
-      return [document.head];
+      return [document$1.head];
     } else if (tagName === 'body') {
-      return [document.body];
+      return [document$1.body];
     } else if (tagName === 'canvas') {
       return [_canvas];
     }
@@ -640,9 +645,9 @@ var document = {
   },
   querySelector: function querySelector(query) {
     if (query === 'head') {
-      return document.head;
+      return document$1.head;
     } else if (query === 'body') {
-      return document.body;
+      return document$1.body;
     } else if (query === 'canvas') {
       return _canvas;
     } else if (query === "#".concat(_canvas.id)) {
@@ -653,9 +658,9 @@ var document = {
   },
   querySelectorAll: function querySelectorAll(query) {
     if (query === 'head') {
-      return [document.head];
+      return [document$1.head];
     } else if (query === 'body') {
-      return [document.body];
+      return [document$1.body];
     } else if (query === 'canvas') {
       return [_canvas];
     }
@@ -716,12 +721,12 @@ function Canvas(canvas) {
   canvas.addEventListener = function (type, listener) {
     var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     // console.log('canvas.addEventListener', type);
-    document.addEventListener(type, listener, options);
+    document$1.addEventListener(type, listener, options);
   };
 
   canvas.removeEventListener = function (type, listener) {
     // console.log('canvas.removeEventListener', type);
-    document.removeEventListener(type, listener);
+    document$1.removeEventListener(type, listener);
   };
 
   canvas.dispatchEvent = function () {
@@ -1006,10 +1011,20 @@ function (_HTMLElement2) {
   return HTMLCanvasElement;
 }(HTMLElement);
 
+function addEventListener(type, listener) {
+  document.addEventListener(type, listener);
+}
+
+function removeEventListener(type, listener) {
+  document.removeEventListener(type, listener);
+}
+
+var AudioContext = null;
+var webkitAudioContext = null;
 // export { setInterval }
 // export { clearTimeout }
 // export { clearInterval }
 // export { requestAnimationFrame }
 // export { cancelAnimationFrame }
 
-export { Canvas, HTMLCanvasElement, HTMLElement, HTMLImageElement, XMLHttpRequest, _canvas as canvas, devicePixelRatio, document, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, screen };
+export { AudioContext, Canvas, HTMLCanvasElement, HTMLElement, HTMLImageElement, noop as VRFrameData, XMLHttpRequest, addEventListener, _canvas as canvas, devicePixelRatio, document$1 as document, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, removeEventListener, screen, webkitAudioContext };
