@@ -20,7 +20,10 @@ const document = {
 
   head: new HTMLElement('head'),
   body: new HTMLElement('body'),
-
+  createElementNS(_, type) {
+    if (type === 'canvas') return window.canvas
+    if (type === 'img') return window.canvas.createImage()
+  },
   createElement(tagName) {
     if (tagName === 'canvas') {
       return new Canvas()
