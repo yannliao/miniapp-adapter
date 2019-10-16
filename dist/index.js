@@ -603,6 +603,10 @@ var document$1 = {
   ontouchend: null,
   head: new HTMLElement('head'),
   body: new HTMLElement('body'),
+  createElementNS: function createElementNS(_, type) {
+    if (type === 'canvas') return _canvas;
+    if (type === 'img') return _canvas.createImage();
+  },
   createElement: function createElement(tagName) {
     if (tagName === 'canvas') {
       return new Canvas();
