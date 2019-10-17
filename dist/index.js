@@ -770,10 +770,6 @@ var navigator = {
   }
 };
 
-var _url = new WeakMap();
-
-var _method = new WeakMap();
-
 var _requestHeader = new WeakMap();
 
 var _responseHeader = new WeakMap();
@@ -781,71 +777,67 @@ var _responseHeader = new WeakMap();
 var _requestTask = new WeakMap();
 
 function _triggerEvent(type) {
-  if (typeof this["on".concat(type)] === 'function') {
-    for (var _len = arguments.length, args = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
+  var event = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  event.target = event.target || this;
 
-    this["on".concat(type)].apply(this, args);
+  if (typeof this["on".concat(type)] === 'function') {
+    this["on".concat(type)].call(this, event);
   }
 }
 
 function _changeReadyState(readyState) {
+  var event = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   this.readyState = readyState;
+  event.readyState = readyState;
 
-  _triggerEvent.call(this, 'readystatechange');
+  _triggerEvent.call(this, 'readystatechange', event);
+}
+
+function _isRelativePath(url) {
+  return !/^(http|https|ftp|wxfile):\/\/.*/i.test(url);
 }
 
 var XMLHttpRequest =
 /*#__PURE__*/
-function () {
-  // TODO 没法模拟 HEADERS_RECEIVED 和 LOADING 两个状态
+function (_EventTarget) {
+  _inherits(XMLHttpRequest, _EventTarget);
 
-  /*
-   * TODO 这一批事件应该是在 XMLHttpRequestEventTarget.prototype 上面的
-   */
   function XMLHttpRequest() {
+    var _this;
+
     _classCallCheck(this, XMLHttpRequest);
 
-    _defineProperty(this, "onabort", null);
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(XMLHttpRequest).call(this));
+    /*
+     * TODO 这一批事件应该是在 XMLHttpRequestEventTarget.prototype 上面的
+     */
 
-    _defineProperty(this, "onerror", null);
+    _this.onabort = null;
+    _this.onerror = null;
+    _this.onload = null;
+    _this.onloadstart = null;
+    _this.onprogress = null;
+    _this.ontimeout = null;
+    _this.onloadend = null;
+    _this.onreadystatechange = null;
+    _this.readyState = 0;
+    _this.response = null;
+    _this.responseText = null;
+    _this.responseType = 'text';
+    _this.dataType = 'string';
+    _this.responseXML = null;
+    _this.status = 0;
+    _this.statusText = '';
+    _this.upload = {};
+    _this.withCredentials = false;
 
-    _defineProperty(this, "onload", null);
-
-    _defineProperty(this, "onloadstart", null);
-
-    _defineProperty(this, "onprogress", null);
-
-    _defineProperty(this, "ontimeout", null);
-
-    _defineProperty(this, "onloadend", null);
-
-    _defineProperty(this, "onreadystatechange", null);
-
-    _defineProperty(this, "readyState", 0);
-
-    _defineProperty(this, "response", null);
-
-    _defineProperty(this, "responseText", null);
-
-    _defineProperty(this, "responseType", '');
-
-    _defineProperty(this, "responseXML", null);
-
-    _defineProperty(this, "status", 0);
-
-    _defineProperty(this, "statusText", '');
-
-    _defineProperty(this, "upload", {});
-
-    _defineProperty(this, "withCredentials", false);
-
-    _requestHeader.set(this, {
+    _requestHeader.set(_assertThisInitialized(_this), {
       'content-type': 'application/x-www-form-urlencoded'
     });
 
-    _responseHeader.set(this, {});
+    _responseHeader.set(_assertThisInitialized(_this), {});
+
+    return _this;
   }
 
   _createClass(XMLHttpRequest, [{
@@ -876,9 +868,8 @@ function () {
     value: function open(method, url
     /* async, user, password 这几个参数在小程序内不支持*/
     ) {
-      _method.set(this, method);
-
-      _url.set(this, url);
+      this._method = method;
+      this._url = url;
 
       _changeReadyState.call(this, XMLHttpRequest.OPENED);
     }
@@ -888,74 +879,123 @@ function () {
   }, {
     key: "send",
     value: function send() {
-      var _this = this;
+      var _this2 = this;
 
       var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : '';
 
       if (this.readyState !== XMLHttpRequest.OPENED) {
         throw new Error("Failed to execute 'send' on 'XMLHttpRequest': The object's state must be OPENED.");
       } else {
+        var url = this._url;
+
+        var header = _requestHeader.get(this);
+
+        var responseType = this.responseType;
+        var dataType = this.dataType;
+
+        var relative = _isRelativePath(url);
+
+        var encoding;
+
+        if (responseType === 'arraybuffer') ; else {
+          encoding = 'utf8';
+        }
+
+        delete this.response;
+        this.response = null;
+
+        var onSuccess = function onSuccess(_ref) {
+          var data = _ref.data,
+              statusCode = _ref.statusCode,
+              header = _ref.header;
+          statusCode = statusCode === undefined ? 200 : statusCode;
+
+          if (typeof data !== 'string' && !(data instanceof ArrayBuffer)) {
+            try {
+              data = JSON.stringify(data);
+            } catch (e) {
+              data = data;
+            }
+          }
+
+          _this2.status = statusCode;
+
+          if (header) {
+            _responseHeader.set(_this2, header);
+          }
+
+          _triggerEvent.call(_this2, 'loadstart');
+
+          _changeReadyState.call(_this2, XMLHttpRequest.HEADERS_RECEIVED);
+
+          _changeReadyState.call(_this2, XMLHttpRequest.LOADING);
+
+          _this2.response = data;
+
+          if (data instanceof ArrayBuffer) {
+            Object.defineProperty(_this2, 'responseText', {
+              enumerable: true,
+              configurable: true,
+              get: function get() {
+                throw "InvalidStateError : responseType is " + this.responseType;
+              }
+            });
+          } else {
+            _this2.responseText = data;
+          }
+
+          _changeReadyState.call(_this2, XMLHttpRequest.DONE);
+
+          _triggerEvent.call(_this2, 'load');
+
+          _triggerEvent.call(_this2, 'loadend');
+        };
+
+        var onFail = function onFail(_ref2) {
+          var errMsg = _ref2.errMsg;
+
+          // TODO 规范错误
+          if (errMsg.indexOf('abort') !== -1) {
+            _triggerEvent.call(_this2, 'abort');
+          } else {
+            _triggerEvent.call(_this2, 'error', {
+              message: errMsg
+            });
+          }
+
+          _triggerEvent.call(_this2, 'loadend');
+
+          if (relative) {
+            // 用户即使没监听error事件, 也给出相应的警告
+            console.warn(errMsg);
+          }
+        };
+
+        if (relative) {
+          var fs = wx.getFileSystemManager();
+          var options = {
+            'filePath': url,
+            'success': onSuccess,
+            'fail': onFail
+          };
+
+          if (encoding) {
+            options['encoding'] = encoding;
+          }
+
+          fs.readFile(options);
+          return;
+        }
+
         wx.request({
           data: data,
-          url: _url.get(this),
-          method: _method.get(this),
-          header: _requestHeader.get(this),
-          responseType: this.responseType,
-          success: function success(_ref) {
-            var data = _ref.data,
-                statusCode = _ref.statusCode,
-                header = _ref.header;
-
-            if (typeof data !== 'string' && !(data instanceof ArrayBuffer)) {
-              try {
-                data = JSON.stringify(data);
-              } catch (e) {
-                data = data;
-              }
-            }
-
-            _this.status = statusCode;
-
-            _responseHeader.set(_this, header);
-
-            _triggerEvent.call(_this, 'loadstart');
-
-            _changeReadyState.call(_this, XMLHttpRequest.HEADERS_RECEIVED);
-
-            _changeReadyState.call(_this, XMLHttpRequest.LOADING);
-
-            _this.response = data;
-
-            if (data instanceof ArrayBuffer) {
-              _this.responseText = '';
-              var bytes = new Uint8Array(data);
-              var len = bytes.byteLength;
-
-              for (var i = 0; i < len; i++) {
-                _this.responseText += String.fromCharCode(bytes[i]);
-              }
-            } else {
-              _this.responseText = data;
-            }
-
-            _changeReadyState.call(_this, XMLHttpRequest.DONE);
-
-            _triggerEvent.call(_this, 'load');
-
-            _triggerEvent.call(_this, 'loadend');
-          },
-          fail: function fail(_ref2) {
-            var errMsg = _ref2.errMsg;
-
-            // TODO 规范错误
-            if (errMsg.indexOf('abort') !== -1) {
-              _triggerEvent.call(_this, 'abort');
-            } else {
-              _triggerEvent.call(_this, 'error', errMsg);
-            }
-
-            _triggerEvent.call(_this, 'loadend');
-          }
+          url: url,
+          method: this._method,
+          header: header,
+          dataType: dataType,
+          responseType: responseType,
+          success: onSuccess,
+          fail: onFail
         });
       }
     }
@@ -968,20 +1008,37 @@ function () {
 
       _requestHeader.set(this, myHeader);
     }
+  }, {
+    key: "addEventListener",
+    value: function addEventListener(type, listener) {
+      var _this3 = this;
+
+      if (typeof listener !== 'function') {
+        return;
+      }
+
+      this['on' + type] = function () {
+        var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        event.target = event.target || _this3;
+        listener.call(_this3, event);
+      };
+    }
+  }, {
+    key: "removeEventListener",
+    value: function removeEventListener(type, listener) {
+      if (this['on' + type] === listener) {
+        this['on' + type] = null;
+      }
+    }
   }]);
 
   return XMLHttpRequest;
-}();
-
-_defineProperty(XMLHttpRequest, "UNSEND", 0);
-
-_defineProperty(XMLHttpRequest, "OPENED", 1);
-
-_defineProperty(XMLHttpRequest, "HEADERS_RECEIVED", 2);
-
-_defineProperty(XMLHttpRequest, "LOADING", 3);
-
-_defineProperty(XMLHttpRequest, "DONE", 4);
+}(EventTarget); // TODO 没法模拟 HEADERS_RECEIVED 和 LOADING 两个状态
+XMLHttpRequest.UNSEND = 0;
+XMLHttpRequest.OPENED = 1;
+XMLHttpRequest.HEADERS_RECEIVED = 2;
+XMLHttpRequest.LOADING = 3;
+XMLHttpRequest.DONE = 4;
 
 var location = {
   href: 'game.js',
