@@ -1,39 +1,58 @@
 import * as window from './window'
+import Event from './Event'
 import HTMLElement from './HTMLElement'
+// import HTMLVideoElement from './HTMLVideoElement'
 import Image from './Image'
-import Audio from './Audio'
+// import Audio from './Audio'
 import Canvas from './Canvas'
-import './EventIniter/index'
+import DocumentElement from './DocumentElement'
+import Body from './Body'
+import './EventIniter/index.js'
 
 const events = {}
 
 const document = {
   readyState: 'complete',
-  visibilityState: 'visible',
-  documentElement: window,
+  visibilityState: 'visible', // 'visible' , 'hidden'
   hidden: false,
-  style: {},
+  fullscreen: true,
+
   location: window.location,
+
+  scripts: [],
+  style: {},
+
   ontouchstart: null,
   ontouchmove: null,
   ontouchend: null,
+  onvisibilitychange: null,
 
-  head: new HTMLElement('head'),
-  body: new HTMLElement('body'),
-  createElementNS(_, type) {
-    if (type === 'canvas') return window.canvas
-    if (type === 'img') return window.canvas.createImage()
-  },
+  parentNode: null,
+  parentElement: null,
   createElement(tagName) {
+    tagName = tagName.toLowerCase();
     if (tagName === 'canvas') {
       return new Canvas()
-    } else if (tagName === 'audio') {
-      return new Audio()
     } else if (tagName === 'img') {
       return new Image()
     }
+    // else if (tagName === 'audio') {
+    //   return new Audio()
+    // } 
+    // } else if (tagName === 'video') {
+    //   return new HTMLVideoElement()
+    // }
 
     return new HTMLElement(tagName)
+  },
+
+  createElementNS(nameSpace, tagName) {
+    return this.createElement(tagName);
+  },
+
+  createTextNode(text) {
+    // TODO: Do we need the TextNode Class ???
+    return text;
   },
 
   getElementById(id) {
@@ -44,6 +63,7 @@ const document = {
   },
 
   getElementsByTagName(tagName) {
+    tagName = tagName.toLowerCase();
     if (tagName === 'head') {
       return [document.head]
     } else if (tagName === 'body') {
@@ -52,6 +72,10 @@ const document = {
       return [window.canvas]
     }
     return []
+  },
+
+  getElementsByTagNameNS(nameSpace, tagName) {
+    return this.getElementsByTagName(tagName);
   },
 
   getElementsByName(tagName) {
@@ -110,14 +134,51 @@ const document = {
   },
 
   dispatchEvent(event) {
-    const listeners = events[event.type]
+    const type = event.type;
+    const listeners = events[type]
 
     if (listeners) {
       for (let i = 0; i < listeners.length; i++) {
         listeners[i](event)
       }
     }
+
+    if (event.target && typeof event.target['on' + type] === 'function') {
+      event.target['on' + type](event)
+    }
   }
+}
+
+document.documentElement = new DocumentElement()
+document.head = new HTMLElement('head')
+document.body = new Body()
+
+function onVisibilityChange(visible) {
+
+  return function () {
+
+    document.visibilityState = visible ? 'visible' : 'hidden';
+
+    const hidden = !visible;
+    if (document.hidden === hidden) {
+      return;
+    }
+    document.hidden = hidden;
+
+    const event = new Event('visibilitychange');
+
+    event.target = document;
+    event.timeStamp = Date.now();
+
+    document.dispatchEvent(event);
+  }
+}
+
+if (wx.onHide) {
+  wx.onHide(onVisibilityChange(false));
+}
+if (wx.onShow) {
+  wx.onShow(onVisibilityChange(true));
 }
 
 export default document

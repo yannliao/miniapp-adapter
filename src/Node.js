@@ -1,13 +1,13 @@
-import EventTarget from './EventTarget'
+import EventTarget from './EventTarget.js'
 
 export default class Node extends EventTarget {
   constructor() {
     super()
+    this.childNodes = []
   }
 
-  childNodes = []
-
   appendChild(node) {
+    this.childNodes.push(node)
     if (node instanceof Node) {
       this.childNodes.push(node)
     } else {

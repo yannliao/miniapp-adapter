@@ -1,25 +1,123 @@
+import document from './document'
 import Canvas from './Canvas'
-import { _canvas } from './Canvas'
-import { noop } from './util/index'
+import { _canvas } from './Canvas'// 暴露全局的 canvas
+
+import CommonComputedStyle from './style/CommonComputedStyle'
+import getImageComputedStyle from './style/ImageComputedStyle'
+import getCanvasComputedStyle from './style/CanvasComputedStyle'
+import Event from './Event'
 
 
-export document from './document'
-export navigator from './navigator'
-export XMLHttpRequest from './XMLHttpRequest'
-// export WebSocket from './WebSocket'
-// export Image from './Image'
-// export Audio from './Audio'
-// export FileReader from './FileReader'
-export HTMLElement from './HTMLElement'
-// export localStorage from './localStorage'
-export location from './location'
+export { default as navigator } from './navigator'
+export { default as XMLHttpRequest } from './XMLHttpRequest'
+export { default as Image } from './Image'
+export { default as Element } from './Element'
+export { default as HTMLElement } from './HTMLElement'
+export { default as location } from './location'
 export * from './WindowProperties'
-export * from './constructor'
 
-// 暴露全局的 canvas
-export { _canvas as canvas }
-export { Canvas }
+const { platform } = wx.getSystemInfoSync()
 
+// export { default as HTMLImageElement } from './HTMLImageElement'
+// export { default as HTMLCanvasElement } from './HTMLCanvasElement'
+// export { default as WebGLRenderingContext } from './WebGLRenderingContext'
+
+
+// export { TouchEvent, PointerEvent, MouseEvent } from './EventIniter/index.js'
+
+
+// export { btoa, atob } from './Base64.js'
+// export { default as localStorage } from './localStorage'
+// export { default as Symbol } from './Symbol'
+// export { default as WebSocket } from './WebSocket'
+// export { default as Worker } from './Worker'
+// export { default as ImageBitmap } from './ImageBitmap'
+// export { default as Audio } from './Audio'
+// export { default as FileReader } from './FileReader'
+// export { default as HTMLMediaElement } from './HTMLMediaElement'
+// export { default as HTMLAudioElement } from './HTMLAudioElement'
+// export { default as HTMLVideoElement } from './HTMLVideoElement'
+
+//helpers
+function getComputedStyle(dom) {
+    const tagName = dom.tagName;
+
+    if (tagName === "CANVAS") {
+        return getCanvasComputedStyle(dom);
+    } else if (tagName === "IMG") {
+        return getImageComputedStyle(dom);
+    }
+
+    return CommonComputedStyle;
+}
+
+function scrollTo(x, y) {
+    // x = Math.min(window.innerWidth, Math.max(0, x));
+    // y = Math.min(window.innerHeight, Math.max(0, y));
+    // We can't scroll the page of WeChatTinyGame, so it'll always be 0.
+
+    // window.scrollX = 0;
+    // window.scrollY = 0;
+}
+
+function scrollBy(dx, dy) {
+    // window.scrollTo(window.scrollX + dx, window.scrollY + dy);
+}
+
+function alert(msg) {
+    console.log(msg);
+}
+
+function focus() { }
+
+function blur() { }
+
+if (platform !== 'devtools') {
+    const wxPerf = wx.getPerformance ? wx.getPerformance() : Date;
+    const consoleTimers = {};
+    console.time = function (name) {
+        consoleTimers[name] = wxPerf.now();
+    };
+
+    console.timeEnd = function (name) {
+        const timeStart = consoleTimers[name];
+        if (!timeStart) {
+            return;
+        }
+
+        const timeElapsed = wxPerf.now() - timeStart;
+        console.log(name + ": " + timeElapsed / 1000 + "ms");
+        delete consoleTimers[name];
+    };
+}
+
+function eventHandlerFactory() {
+    return (res) => {
+        const event = new Event('resize')
+
+        event.target = window;
+        event.timeStamp = Date.now();
+        event.res = res;
+        event.windowWidth = res.windowWidth;
+        event.windowHeight = res.windowHeight;
+        document.dispatchEvent(event);
+    }
+}
+
+if (wx.onWindowResize) {
+    wx.onWindowResize(eventHandlerFactory())
+}
+
+// const _setTimeout = setTimeout;
+// const _clearTimeout = clearTimeout;
+// const _setInterval = setInterval;
+// const _clearInterval = clearInterval;
+// const _requestAnimationFrame = requestAnimationFrame;
+// const _cancelAnimationFrame = cancelAnimationFrame;
+
+//TODO
+let AudioContext = null
+let webkitAudioContext = null
 function addEventListener(type, listener) {
     document.addEventListener(type, listener)
 }
@@ -27,18 +125,29 @@ function removeEventListener(type, listener) {
     document.removeEventListener(type, listener)
 }
 
-export { addEventListener }
-export { removeEventListener }
-//TODO
-let AudioContext = null
-let webkitAudioContext = null
-export { AudioContext }
-export { webkitAudioContext }
-export { noop as VRFrameData }
+export {
+    // 暴露全局的 canvas
+    _canvas as canvas,
+    Canvas,
 
-// export { setTimeout }
-// export { setInterval }
-// export { clearTimeout }
-// export { clearInterval }
-// export { requestAnimationFrame }
-// export { cancelAnimationFrame }
+    AudioContext,
+    webkitAudioContext,
+
+    noop as VRFrameData,
+    addEventListener,
+    removeEventListener,
+
+    alert,
+    focus,
+    blur,
+    getComputedStyle,
+    scrollTo,
+    scrollBy,
+
+    // _setTimeout as setTimeout,
+    // _clearTimeout as clearTimeout,
+    // _setInterval as setInterval,
+    // _clearInterval as clearInterval,
+    // _requestAnimationFrame as requestAnimationFrame,
+    // _cancelAnimationFrame as cancelAnimationFrame
+}
