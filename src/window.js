@@ -1,3 +1,4 @@
+import { noop } from './util/index.js'
 import document from './document'
 import Canvas from './Canvas'
 import { _canvas } from './Canvas'// 暴露全局的 canvas
