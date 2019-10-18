@@ -25,6 +25,7 @@ const { platform } = wx.getSystemInfoSync()
 
 
 // export { TouchEvent, PointerEvent, MouseEvent } from './EventIniter/index.js'
+import { TouchEvent, Touch} from './EventIniter/index.js'
 
 
 // export { btoa, atob } from './Base64.js'
@@ -92,8 +93,8 @@ if (platform !== 'devtools') {
     };
 }
 
-function eventHandlerFactory() {
-    return (res) => {
+if (wx.onWindowResize) {
+    wx.onWindowResize((res) => {
         const event = new Event('resize')
 
         event.target = window;
@@ -102,11 +103,27 @@ function eventHandlerFactory() {
         event.windowWidth = res.windowWidth;
         event.windowHeight = res.windowHeight;
         document.dispatchEvent(event);
-    }
+    })
 }
+function touchEventHandlerFactory(target, type) {
+    return (rawEvent) => {
+        const event = new TouchEvent(type)
+        event.changedTouches = rawEvent.changedTouches.map(touch => new Touch(touch))
+        event.touches = rawEvent.touches.map(touch => new Touch(touch))
+        event.targetTouches = Array.prototype.slice.call(rawEvent.touches.map(touch => new Touch(touch)))
+        event.timeStamp = rawEvent.timeStamp
 
-if (wx.onWindowResize) {
-    wx.onWindowResize(eventHandlerFactory())
+        if (target == 'document') {
+            event.target = document
+            event.currentTarget = document
+            document.dispatchEvent(event)
+        } else {
+            let canvas = document.getElementsByTagName('canvas')
+            event.target = canvas
+            event.currentTarget = canvas
+            canvas.dispatchEvent(event)
+        }
+    }
 }
 
 // const _setTimeout = setTimeout;
@@ -145,6 +162,8 @@ export {
     scrollTo,
     scrollBy,
 
+    touchEventHandlerFactory,
+    TouchEvent,
     // _setTimeout as setTimeout,
     // _clearTimeout as clearTimeout,
     // _setInterval as setInterval,

@@ -10,25 +10,30 @@ export default class TouchEvent extends Event {
         this.targetTouches = []
         this.changedTouches = []
 
-        this.target = window.canvas
-        this.currentTarget = window.canvas
+        this.target = null
+        this.currentTarget = null
     }
 }
 
-function eventHandlerFactory(type) {
-    return (rawEvent) => {
-        const event = new TouchEvent(type)
+export class Touch {
+    constructor(touch) {
+        // CanvasTouch{identifier, x, y}
+        // Touch{identifier, pageX, pageY, clientX, clientY, force}
+        this.identifier = touch.identifier
 
-        event.changedTouches = rawEvent.changedTouches
-        event.touches = rawEvent.touches
-        event.targetTouches = Array.prototype.slice.call(rawEvent.touches)
-        event.timeStamp = rawEvent.timeStamp
+        this.force = touch.force === undefined ? 1 : touch.force
+        this.pageX = touch.pageX || touch.x
+        this.pageY = touch.pageY || touch.y
+        this.clientX = touch.clientX || touch.x
+        this.clientY = touch.clientY || touch.y
 
-        document.dispatchEvent(event)
+        this.screenX = this.pageX
+        this.screenY = this.pageY
     }
 }
 
-wx.onTouchStart(eventHandlerFactory('touchstart'))
-wx.onTouchMove(eventHandlerFactory('touchmove'))
-wx.onTouchEnd(eventHandlerFactory('touchend'))
-wx.onTouchCancel(eventHandlerFactory('touchcancel'))
+
+// wx.onTouchStart(eventHandlerFactory('touchstart'))
+// wx.onTouchMove(eventHandlerFactory('touchmove'))
+// wx.onTouchEnd(eventHandlerFactory('touchend'))
+// wx.onTouchCancel(eventHandlerFactory('touchcancel'))
