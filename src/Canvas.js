@@ -1,49 +1,26 @@
 // import { HTMLCanvasElement, CanvasRenderingContext2D, WebGLRenderingContext } from './constructor'
-// import HTMLElement from './HTMLElement'
-import * as window from './window'
-import document from './document'
+import HTMLElement from './HTMLElement'
+import * as Mixin from './util/mixin'
 
 let hasModifiedCanvasPrototype = false
 let hasInit2DContextConstructor = false
 let hasInitWebGLContextConstructor = false
+
 let _canvas = null
-export default function Canvas(canvas) {
-  if (_canvas) {
-    return _canvas
-  }
-  if (!canvas) {
-    throw new Error('need a canvas')
-  }
-  canvas.type = 'canvas'
-  canvas.style = { width: canvas.width + 'px', height: canvas.height + 'px' }
-  canvas.focus = function () { };
-  canvas.blur = function () { };
-
-  canvas.addEventListener = function (type, listener, options = {}) {
-    // console.log('canvas.addEventListener', type);
-    document.addEventListener(type, listener, options);
-  }
-
-  canvas.removeEventListener = function (type, listener) {
-    // console.log('canvas.removeEventListener', type);
-    document.removeEventListener(type, listener);
-  }
-
-  canvas.dispatchEvent = function (event = {}) {
-    console.log('canvas.dispatchEvent', event.type, event);
-    // nothing to do
-  }
-
-  canvas.getBoundingClientRect = () => {
-    const ret = {
-      top: 0,
-      left: 0,
-      width: window.innerWidth,
-      height: window.innerHeight
+function Canvas(canvas) {
+    if (!_canvas) {
+        if (!canvas) {
+            throw new Error('need a canvas')
+        }
+        _canvas = canvas
+        _canvas.type = 'canvas';
+        let element = new HTMLElement('canvas')
+        Mixin.copyProperties(_canvas, element); // 拷贝实例属性
+        Mixin.copyProperties(_canvas.constructor, HTMLElement); // 拷贝静态属性
+        Mixin.copyProperties(_canvas.constructor.prototype, element.prototype); // 拷贝原型属性
     }
-    return ret
-  }
-  _canvas = canvas
-  return _canvas
+    return _canvas
 }
+
 export { _canvas }
+export default Canvas

@@ -69,19 +69,6 @@ function _possibleConstructorReturn(self, call) {
   return _assertThisInitialized(self);
 }
 
-var Event = function Event(type) {
-  _classCallCheck(this, Event);
-
-  this.cancelBubble = false;
-  this.cancelable = false;
-  this.target = null;
-  this.currentTarget = null;
-  this.preventDefault = noop;
-  this.stopPropagation = noop;
-  this.type = type;
-  this.timeStamp = Date.now();
-};
-
 var performance;
 
 if (wx.getPerformance) {
@@ -237,6 +224,35 @@ function classList(obj) {
   obj.classList.remove = noop;
   obj.classList.contains = noop;
   obj.classList.toggle = noop;
+}
+function copyProperties(target, source) {
+  var _iteratorNormalCompletion = true;
+  var _didIteratorError = false;
+  var _iteratorError = undefined;
+
+  try {
+    for (var _iterator = Object.getOwnPropertyNames(source)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+      var key = _step.value;
+
+      if (key !== 'constructor' && key !== 'prototype' && key !== 'name') {
+        var desc = Object.getOwnPropertyDescriptor(source, key);
+        Object.defineProperty(target, key, desc);
+      }
+    }
+  } catch (err) {
+    _didIteratorError = true;
+    _iteratorError = err;
+  } finally {
+    try {
+      if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+        _iterator["return"]();
+      }
+    } finally {
+      if (_didIteratorError) {
+        throw _iteratorError;
+      }
+    }
+  }
 }
 
 var _events = new WeakMap();
@@ -446,263 +462,25 @@ function (_Element) {
   return HTMLElement;
 }(Element);
 
-function Image () {
-  var canvas = new Canvas();
-
-  if (!canvas) {
-    throw new Error('global canvas need!');
-  }
-
-  var image = new Canvas().createImage(); // image.__proto__.__proto__.__proto__ = new HTMLImageElement();
-
-  if (!('tagName' in image)) {
-    image.tagName = 'IMG';
-  }
-
-  parentNode(image);
-  classList(image);
-  return image;
-}
-
-var DocumentElement =
-/*#__PURE__*/
-function (_HTMLElement) {
-  _inherits(DocumentElement, _HTMLElement);
-
-  function DocumentElement() {
-    _classCallCheck(this, DocumentElement);
-
-    return _possibleConstructorReturn(this, _getPrototypeOf(DocumentElement).call(this, 'html', 0));
-  }
-
-  return DocumentElement;
-}(HTMLElement);
-
-var Body =
-/*#__PURE__*/
-function (_HTMLElement) {
-  _inherits(Body, _HTMLElement);
-
-  function Body() {
-    _classCallCheck(this, Body);
-
-    // 为了性能, 此处不按照标准的DOM层级关系设计
-    // 将 body 设置为 0级, parent元素为null
-    return _possibleConstructorReturn(this, _getPrototypeOf(Body).call(this, 'body', 0));
-  }
-
-  return Body;
-}(HTMLElement);
-
-var events = {};
-var document$1 = {
-  readyState: 'complete',
-  visibilityState: 'visible',
-  // 'visible' , 'hidden'
-  hidden: false,
-  fullscreen: true,
-  location: location,
-  scripts: [],
-  style: {},
-  ontouchstart: null,
-  ontouchmove: null,
-  ontouchend: null,
-  onvisibilitychange: null,
-  parentNode: null,
-  parentElement: null,
-  createElement: function createElement(tagName) {
-    tagName = tagName.toLowerCase();
-
-    if (tagName === 'canvas') {
-      return new Canvas();
-    } else if (tagName === 'img') {
-      return new Image();
-    } // else if (tagName === 'audio') {
-    //   return new Audio()
-    // } 
-    // } else if (tagName === 'video') {
-    //   return new HTMLVideoElement()
-    // }
-
-
-    return new HTMLElement(tagName);
-  },
-  createElementNS: function createElementNS(nameSpace, tagName) {
-    return this.createElement(tagName);
-  },
-  createTextNode: function createTextNode(text) {
-    // TODO: Do we need the TextNode Class ???
-    return text;
-  },
-  getElementById: function getElementById(id) {
-    if (id === _canvas.id) {
-      return _canvas;
-    }
-
-    return null;
-  },
-  getElementsByTagName: function getElementsByTagName(tagName) {
-    tagName = tagName.toLowerCase();
-
-    if (tagName === 'head') {
-      return [document$1.head];
-    } else if (tagName === 'body') {
-      return [document$1.body];
-    } else if (tagName === 'canvas') {
-      return [_canvas];
-    }
-
-    return [];
-  },
-  getElementsByTagNameNS: function getElementsByTagNameNS(nameSpace, tagName) {
-    return this.getElementsByTagName(tagName);
-  },
-  getElementsByName: function getElementsByName(tagName) {
-    if (tagName === 'head') {
-      return [document$1.head];
-    } else if (tagName === 'body') {
-      return [document$1.body];
-    } else if (tagName === 'canvas') {
-      return [_canvas];
-    }
-
-    return [];
-  },
-  querySelector: function querySelector(query) {
-    if (query === 'head') {
-      return document$1.head;
-    } else if (query === 'body') {
-      return document$1.body;
-    } else if (query === 'canvas') {
-      return _canvas;
-    } else if (query === "#".concat(_canvas.id)) {
-      return _canvas;
-    }
-
-    return null;
-  },
-  querySelectorAll: function querySelectorAll(query) {
-    if (query === 'head') {
-      return [document$1.head];
-    } else if (query === 'body') {
-      return [document$1.body];
-    } else if (query === 'canvas') {
-      return [_canvas];
-    }
-
-    return [];
-  },
-  addEventListener: function addEventListener(type, listener) {
-    if (!events[type]) {
-      events[type] = [];
-    }
-
-    events[type].push(listener);
-  },
-  removeEventListener: function removeEventListener(type, listener) {
-    var listeners = events[type];
-
-    if (listeners && listeners.length > 0) {
-      for (var i = listeners.length; i--; i > 0) {
-        if (listeners[i] === listener) {
-          listeners.splice(i, 1);
-          break;
-        }
-      }
-    }
-  },
-  dispatchEvent: function dispatchEvent(event) {
-    var type = event.type;
-    var listeners = events[type];
-
-    if (listeners) {
-      for (var i = 0; i < listeners.length; i++) {
-        listeners[i](event);
-      }
-    }
-
-    if (event.target && typeof event.target['on' + type] === 'function') {
-      event.target['on' + type](event);
-    }
-  }
-};
-document$1.documentElement = new DocumentElement();
-document$1.head = new HTMLElement('head');
-document$1.body = new Body();
-
-function onVisibilityChange(visible) {
-  return function () {
-    document$1.visibilityState = visible ? 'visible' : 'hidden';
-    var hidden = !visible;
-
-    if (document$1.hidden === hidden) {
-      return;
-    }
-
-    document$1.hidden = hidden;
-    var event = new Event('visibilitychange');
-    event.target = document$1;
-    event.timeStamp = Date.now();
-    document$1.dispatchEvent(event);
-  };
-}
-
-if (wx.onHide) {
-  wx.onHide(onVisibilityChange(false));
-}
-
-if (wx.onShow) {
-  wx.onShow(onVisibilityChange(true));
-}
-
 // import { HTMLCanvasElement, CanvasRenderingContext2D, WebGLRenderingContext } from './constructor'
 var _canvas = null;
+
 function Canvas(canvas) {
-  if (_canvas) {
-    return _canvas;
+  if (!_canvas) {
+    if (!canvas) {
+      throw new Error('need a canvas');
+    }
+
+    _canvas = canvas;
+    _canvas.type = 'canvas';
+    var element = new HTMLElement('canvas');
+    copyProperties(_canvas, element); // 拷贝实例属性
+
+    copyProperties(_canvas.constructor, HTMLElement); // 拷贝静态属性
+
+    copyProperties(_canvas.constructor.prototype, element.prototype); // 拷贝原型属性
   }
 
-  if (!canvas) {
-    throw new Error('need a canvas');
-  }
-
-  canvas.type = 'canvas';
-  canvas.style = {
-    width: canvas.width + 'px',
-    height: canvas.height + 'px'
-  };
-
-  canvas.focus = function () {};
-
-  canvas.blur = function () {};
-
-  canvas.addEventListener = function (type, listener) {
-    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    // console.log('canvas.addEventListener', type);
-    document$1.addEventListener(type, listener, options);
-  };
-
-  canvas.removeEventListener = function (type, listener) {
-    // console.log('canvas.removeEventListener', type);
-    document$1.removeEventListener(type, listener);
-  };
-
-  canvas.dispatchEvent = function () {
-    var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    console.log('canvas.dispatchEvent', event.type, event); // nothing to do
-  };
-
-  canvas.getBoundingClientRect = function () {
-    var ret = {
-      top: 0,
-      left: 0,
-      width: innerWidth,
-      height: innerHeight
-    };
-    return ret;
-  };
-
-  _canvas = canvas;
   return _canvas;
 }
 
@@ -1327,6 +1105,228 @@ function getCanvasComputedStyle(canvas) {
     "height": rect.height + "px"
   });
   return style;
+}
+
+var Event = function Event(type) {
+  _classCallCheck(this, Event);
+
+  this.cancelBubble = false;
+  this.cancelable = false;
+  this.target = null;
+  this.currentTarget = null;
+  this.preventDefault = noop;
+  this.stopPropagation = noop;
+  this.type = type;
+  this.timeStamp = Date.now();
+};
+
+function Image () {
+  var canvas = new Canvas();
+
+  if (!canvas) {
+    throw new Error('global canvas need!');
+  }
+
+  var image = new Canvas().createImage(); // image.__proto__.__proto__.__proto__ = new HTMLImageElement();
+
+  if (!('tagName' in image)) {
+    image.tagName = 'IMG';
+  }
+
+  parentNode(image);
+  classList(image);
+  return image;
+}
+
+var DocumentElement =
+/*#__PURE__*/
+function (_HTMLElement) {
+  _inherits(DocumentElement, _HTMLElement);
+
+  function DocumentElement() {
+    _classCallCheck(this, DocumentElement);
+
+    return _possibleConstructorReturn(this, _getPrototypeOf(DocumentElement).call(this, 'html', 0));
+  }
+
+  return DocumentElement;
+}(HTMLElement);
+
+var Body =
+/*#__PURE__*/
+function (_HTMLElement) {
+  _inherits(Body, _HTMLElement);
+
+  function Body() {
+    _classCallCheck(this, Body);
+
+    // 为了性能, 此处不按照标准的DOM层级关系设计
+    // 将 body 设置为 0级, parent元素为null
+    return _possibleConstructorReturn(this, _getPrototypeOf(Body).call(this, 'body', 0));
+  }
+
+  return Body;
+}(HTMLElement);
+
+var events = {};
+var document$1 = {
+  readyState: 'complete',
+  visibilityState: 'visible',
+  // 'visible' , 'hidden'
+  hidden: false,
+  fullscreen: true,
+  location: location,
+  scripts: [],
+  style: {},
+  ontouchstart: null,
+  ontouchmove: null,
+  ontouchend: null,
+  onvisibilitychange: null,
+  parentNode: null,
+  parentElement: null,
+  createElement: function createElement(tagName) {
+    tagName = tagName.toLowerCase();
+
+    if (tagName === 'canvas') {
+      return new Canvas();
+    } else if (tagName === 'img') {
+      return new Image();
+    } // else if (tagName === 'audio') {
+    //   return new Audio()
+    // } 
+    // } else if (tagName === 'video') {
+    //   return new HTMLVideoElement()
+    // }
+
+
+    return new HTMLElement(tagName);
+  },
+  createElementNS: function createElementNS(nameSpace, tagName) {
+    return this.createElement(tagName);
+  },
+  createTextNode: function createTextNode(text) {
+    // TODO: Do we need the TextNode Class ???
+    return text;
+  },
+  getElementById: function getElementById(id) {
+    if (id === _canvas.id) {
+      return _canvas;
+    }
+
+    return null;
+  },
+  getElementsByTagName: function getElementsByTagName(tagName) {
+    tagName = tagName.toLowerCase();
+
+    if (tagName === 'head') {
+      return [document$1.head];
+    } else if (tagName === 'body') {
+      return [document$1.body];
+    } else if (tagName === 'canvas') {
+      return [_canvas];
+    }
+
+    return [];
+  },
+  getElementsByTagNameNS: function getElementsByTagNameNS(nameSpace, tagName) {
+    return this.getElementsByTagName(tagName);
+  },
+  getElementsByName: function getElementsByName(tagName) {
+    if (tagName === 'head') {
+      return [document$1.head];
+    } else if (tagName === 'body') {
+      return [document$1.body];
+    } else if (tagName === 'canvas') {
+      return [_canvas];
+    }
+
+    return [];
+  },
+  querySelector: function querySelector(query) {
+    if (query === 'head') {
+      return document$1.head;
+    } else if (query === 'body') {
+      return document$1.body;
+    } else if (query === 'canvas') {
+      return _canvas;
+    } else if (query === "#".concat(_canvas.id)) {
+      return _canvas;
+    }
+
+    return null;
+  },
+  querySelectorAll: function querySelectorAll(query) {
+    if (query === 'head') {
+      return [document$1.head];
+    } else if (query === 'body') {
+      return [document$1.body];
+    } else if (query === 'canvas') {
+      return [_canvas];
+    }
+
+    return [];
+  },
+  addEventListener: function addEventListener(type, listener) {
+    if (!events[type]) {
+      events[type] = [];
+    }
+
+    events[type].push(listener);
+  },
+  removeEventListener: function removeEventListener(type, listener) {
+    var listeners = events[type];
+
+    if (listeners && listeners.length > 0) {
+      for (var i = listeners.length; i--; i > 0) {
+        if (listeners[i] === listener) {
+          listeners.splice(i, 1);
+          break;
+        }
+      }
+    }
+  },
+  dispatchEvent: function dispatchEvent(event) {
+    var type = event.type;
+    var listeners = events[type];
+
+    if (listeners) {
+      for (var i = 0; i < listeners.length; i++) {
+        listeners[i](event);
+      }
+    }
+
+    if (event.target && typeof event.target['on' + type] === 'function') {
+      event.target['on' + type](event);
+    }
+  }
+};
+document$1.documentElement = new DocumentElement();
+document$1.head = new HTMLElement('head');
+document$1.body = new Body();
+
+function onVisibilityChange(visible) {
+  return function () {
+    document$1.visibilityState = visible ? 'visible' : 'hidden';
+    var hidden = !visible;
+
+    if (document$1.hidden === hidden) {
+      return;
+    }
+
+    document$1.hidden = hidden;
+    var event = new Event('visibilitychange');
+    event.target = document$1;
+    event.timeStamp = Date.now();
+    document$1.dispatchEvent(event);
+  };
+}
+
+if (wx.onHide) {
+  wx.onHide(onVisibilityChange(false));
+}
+
+if (wx.onShow) {
+  wx.onShow(onVisibilityChange(true));
 }
 
 var systemInfo = wx.getSystemInfoSync();
