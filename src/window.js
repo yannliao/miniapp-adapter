@@ -7,13 +7,13 @@ import getImageComputedStyle from './style/ImageComputedStyle'
 import getCanvasComputedStyle from './style/CanvasComputedStyle'
 import Event from './Event'
 
+export { default as location } from './location'
 export { default as document } from './document'
 export { default as navigator } from './navigator'
 export { default as XMLHttpRequest } from './XMLHttpRequest'
 export { default as Image } from './Image'
 export { default as Element } from './Element'
 export { default as HTMLElement } from './HTMLElement'
-export { default as location } from './location'
 export * from './WindowProperties'
 
 const { platform } = wx.getSystemInfoSync()
