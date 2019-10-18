@@ -96,7 +96,7 @@ if (wx.onWindowResize) {
     wx.onWindowResize((res) => {
         const event = new Event('resize')
 
-        event.target = window;
+        event.target = document;
         event.timeStamp = Date.now();
         event.res = res;
         event.windowWidth = res.windowWidth;

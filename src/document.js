@@ -1,4 +1,4 @@
-import * as window from './window'
+import * as _window from './window'
 import Event from './Event'
 import HTMLElement from './HTMLElement'
 // import HTMLVideoElement from './HTMLVideoElement'
@@ -17,7 +17,7 @@ const document = {
     hidden: false,
     fullscreen: true,
 
-    location: window.location,
+    location: _window.location,
 
     scripts: [],
     style: {},
