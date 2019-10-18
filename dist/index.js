@@ -1770,7 +1770,7 @@ function touchEventHandlerFactory(target, type) {
       event.currentTarget = document;
       document.dispatchEvent(event);
     } else {
-      var canvas = document.getElementsByTagName('canvas');
+      var canvas = document.getElementsByTagName('canvas')[0];
       event.target = canvas;
       event.currentTarget = canvas;
       canvas.dispatchEvent(event);

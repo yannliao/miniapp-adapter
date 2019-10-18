@@ -118,7 +118,7 @@ function touchEventHandlerFactory(target, type) {
             event.currentTarget = document
             document.dispatchEvent(event)
         } else {
-            let canvas = document.getElementsByTagName('canvas')
+            let canvas = document.getElementsByTagName('canvas')[0]
             event.target = canvas
             event.currentTarget = canvas
             canvas.dispatchEvent(event)
