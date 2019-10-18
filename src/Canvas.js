@@ -1,5 +1,7 @@
 // import { HTMLCanvasElement, CanvasRenderingContext2D, WebGLRenderingContext } from './constructor'
 import HTMLElement from './HTMLElement'
+import EventTarget from './EventTarget'
+
 import * as Mixin from './util/mixin'
 
 let hasModifiedCanvasPrototype = false
@@ -16,8 +18,8 @@ function Canvas(canvas) {
         _canvas.type = 'canvas';
         let element = new HTMLElement('canvas')
         Mixin.copyProperties(_canvas, element); // 拷贝实例属性
-        Mixin.copyProperties(_canvas.constructor, HTMLElement); // 拷贝静态属性
-        Mixin.copyProperties(_canvas.constructor.prototype, element.prototype); // 拷贝原型属性
+        Mixin.copyProperties(_canvas.constructor.prototype, EventTarget.prototype); // 拷贝EventTarget原型属性
+        Mixin.copyProperties(_canvas.constructor.prototype, HTMLElement.prototype); // 拷贝HTMLElement原型属性
     }
     return _canvas
 }

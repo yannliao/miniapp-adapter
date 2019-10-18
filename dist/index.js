@@ -476,9 +476,9 @@ function Canvas(canvas) {
     var element = new HTMLElement('canvas');
     copyProperties(_canvas, element); // 拷贝实例属性
 
-    copyProperties(_canvas.constructor, HTMLElement); // 拷贝静态属性
+    copyProperties(_canvas.constructor.prototype, EventTarget.prototype); // 拷贝EventTarget原型属性
 
-    copyProperties(_canvas.constructor.prototype, element.prototype); // 拷贝原型属性
+    copyProperties(_canvas.constructor.prototype, HTMLElement.prototype); // 拷贝HTMLElement原型属性
   }
 
   return _canvas;
