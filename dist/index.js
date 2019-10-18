@@ -1168,6 +1168,45 @@ function (_HTMLElement) {
   return Body;
 }(HTMLElement);
 
+var TouchEvent =
+/*#__PURE__*/
+function (_Event) {
+  _inherits(TouchEvent, _Event);
+
+  function TouchEvent(type) {
+    var _this;
+
+    _classCallCheck(this, TouchEvent);
+
+    _this = _possibleConstructorReturn(this, _getPrototypeOf(TouchEvent).call(this, type));
+    _this.touches = [];
+    _this.targetTouches = [];
+    _this.changedTouches = [];
+    _this.target = null;
+    _this.currentTarget = null;
+    return _this;
+  }
+
+  return TouchEvent;
+}(Event);
+var Touch = function Touch(touch) {
+  _classCallCheck(this, Touch);
+
+  // CanvasTouch{identifier, x, y}
+  // Touch{identifier, pageX, pageY, clientX, clientY, force}
+  this.identifier = touch.identifier;
+  this.force = touch.force === undefined ? 1 : touch.force;
+  this.pageX = touch.pageX || touch.x;
+  this.pageY = touch.pageY || touch.y;
+  this.clientX = touch.clientX || touch.x;
+  this.clientY = touch.clientY || touch.y;
+  this.screenX = this.pageX;
+  this.screenY = this.pageY;
+}; // wx.onTouchStart(eventHandlerFactory('touchstart'))
+// wx.onTouchMove(eventHandlerFactory('touchmove'))
+// wx.onTouchEnd(eventHandlerFactory('touchend'))
+// wx.onTouchCancel(eventHandlerFactory('touchcancel'))
+
 var events = {};
 var document$1 = {
   readyState: 'complete',
@@ -1637,10 +1676,6 @@ var location = {
 
 var _wx$getSystemInfoSync$2 = wx.getSystemInfoSync(),
     platform$2 = _wx$getSystemInfoSync$2.platform; // export { default as HTMLImageElement } from './HTMLImageElement'
-// export { default as HTMLCanvasElement } from './HTMLCanvasElement'
-// export { default as WebGLRenderingContext } from './WebGLRenderingContext'
-// export { TouchEvent, PointerEvent, MouseEvent } from './EventIniter/index.js'
-// export { btoa, atob } from './Base64.js'
 // export { default as localStorage } from './localStorage'
 // export { default as Symbol } from './Symbol'
 // export { default as WebSocket } from './WebSocket'
@@ -1652,7 +1687,6 @@ var _wx$getSystemInfoSync$2 = wx.getSystemInfoSync(),
 // export { default as HTMLAudioElement } from './HTMLAudioElement'
 // export { default as HTMLVideoElement } from './HTMLVideoElement'
 //helpers
-
 
 function getComputedStyle(dom) {
   var tagName = dom.tagName;
@@ -1705,8 +1739,8 @@ if (platform$2 !== 'devtools') {
   };
 }
 
-function eventHandlerFactory() {
-  return function (res) {
+if (wx.onWindowResize) {
+  wx.onWindowResize(function (res) {
     var event = new Event('resize');
     event.target = window;
     event.timeStamp = Date.now();
@@ -1714,11 +1748,34 @@ function eventHandlerFactory() {
     event.windowWidth = res.windowWidth;
     event.windowHeight = res.windowHeight;
     document.dispatchEvent(event);
-  };
+  });
 }
 
-if (wx.onWindowResize) {
-  wx.onWindowResize(eventHandlerFactory());
+function touchEventHandlerFactory(target, type) {
+  return function (rawEvent) {
+    var event = new TouchEvent(type);
+    event.changedTouches = rawEvent.changedTouches.map(function (touch) {
+      return new Touch(touch);
+    });
+    event.touches = rawEvent.touches.map(function (touch) {
+      return new Touch(touch);
+    });
+    event.targetTouches = Array.prototype.slice.call(rawEvent.touches.map(function (touch) {
+      return new Touch(touch);
+    }));
+    event.timeStamp = rawEvent.timeStamp;
+
+    if (target == 'document') {
+      event.target = document;
+      event.currentTarget = document;
+      document.dispatchEvent(event);
+    } else {
+      var canvas = document.getElementsByTagName('canvas');
+      event.target = canvas;
+      event.currentTarget = canvas;
+      canvas.dispatchEvent(event);
+    }
+  };
 } // const _setTimeout = setTimeout;
 // const _clearTimeout = clearTimeout;
 // const _setInterval = setInterval;
@@ -1739,4 +1796,4 @@ function removeEventListener(type, listener) {
   document.removeEventListener(type, listener);
 }
 
-export { AudioContext, Canvas, Element, HTMLElement, Image, noop as VRFrameData, XMLHttpRequest, addEventListener, alert, blur, _canvas as canvas, devicePixelRatio, document$1 as document, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, removeEventListener, screen, scrollBy, scrollTo, scrollX, scrollY, webkitAudioContext };
+export { AudioContext, Canvas, Element, HTMLElement, Image, TouchEvent, noop as VRFrameData, XMLHttpRequest, addEventListener, alert, blur, _canvas as canvas, devicePixelRatio, document$1 as document, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, removeEventListener, screen, scrollBy, scrollTo, scrollX, scrollY, touchEventHandlerFactory, webkitAudioContext };
