@@ -69,6 +69,26 @@ function _possibleConstructorReturn(self, call) {
   return _assertThisInitialized(self);
 }
 
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+}
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  }
+}
+
+function _iterableToArray(iter) {
+  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+}
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance");
+}
+
 var performance;
 
 if (wx.getPerformance) {
@@ -463,25 +483,77 @@ function (_Element) {
 }(Element);
 
 // import { HTMLCanvasElement, CanvasRenderingContext2D, WebGLRenderingContext } from './constructor'
-var _canvas = null;
+var _canvas = null; //目前使用的canvas
 
-function Canvas(canvas) {
-  if (!_canvas) {
-    if (!canvas) {
-      throw new Error('need a canvas');
+var _canvasMap = new Map();
+
+function registerCanvas() {
+  var id = null;
+  var canvas = null;
+
+  for (var _len = arguments.length, argus = new Array(_len), _key = 0; _key < _len; _key++) {
+    argus[_key] = arguments[_key];
+  }
+
+  if (argus.length === 0) {
+    throw new Error('need arguments');
+  } else if (argus.length === 1 && argus[0]._canvasId) {
+    canvas = argus[0];
+    id = argus[0]._canvasId;
+  } else if (argus.length === 2 && typeof argus[0] === 'string' && argus[1]._canvasId) {
+    id = argus[0];
+    canvas = argus[1];
+  }
+
+  if (!id || !canvas) {
+    throw new Error('parameter err');
+  }
+
+  if (_canvasMap.size >= 5) {
+    console.warn('canvas map size bigger 5 please remove unused canvas!');
+
+    var key = _canvasMap.keys().next().value;
+
+    if (key) {
+      _canvasMap["delete"](key);
     }
+  }
+
+  if (_canvasMap.has(id)) {
+    _canvas = _canvasMap.get(id);
+  } else {
+    canvas.type = 'canvas';
+    var element = new HTMLElement('canvas');
+    copyProperties(canvas, element); // 拷贝实例属性
+
+    copyProperties(canvas.constructor.prototype, EventTarget.prototype); // 拷贝EventTarget原型属性
+
+    copyProperties(canvas.constructor.prototype, HTMLElement.prototype); // 拷贝HTMLElement原型属性
+
+    _canvasMap.set(id, canvas);
 
     _canvas = canvas;
-    _canvas.type = 'canvas';
-    var element = new HTMLElement('canvas');
-    copyProperties(_canvas, element); // 拷贝实例属性
-
-    copyProperties(_canvas.constructor.prototype, EventTarget.prototype); // 拷贝EventTarget原型属性
-
-    copyProperties(_canvas.constructor.prototype, HTMLElement.prototype); // 拷贝HTMLElement原型属性
   }
 
   return _canvas;
+}
+
+function unregisterCanvas(argu) {
+  if (!argu) {
+    throw new Error('need arguments');
+  }
+
+  if (typeof argu === 'string') {
+    return _canvasMap["delete"](argu);
+  } else if (argu._canvasId) {
+    return _canvasMap["delete"](argu._canvasId);
+  }
+
+  return false;
+}
+
+function clearCanvas() {
+  _canvasMap.clear();
 }
 
 var style$1 = {
@@ -1120,14 +1192,14 @@ var Event = function Event(type) {
   this.timeStamp = Date.now();
 };
 
-function Image () {
-  var canvas = new Canvas();
+function Image() {
+  var canvas = _canvas;
 
   if (!canvas) {
-    throw new Error('global canvas need!');
+    throw new Error('please register a canvas');
   }
 
-  var image = new Canvas().createImage(); // image.__proto__.__proto__.__proto__ = new HTMLImageElement();
+  var image = canvas.createImage(); // image.__proto__.__proto__.__proto__ = new HTMLImageElement();
 
   if (!('tagName' in image)) {
     image.tagName = 'IMG';
@@ -1227,7 +1299,11 @@ var document$1 = {
     tagName = tagName.toLowerCase();
 
     if (tagName === 'canvas') {
-      return new Canvas();
+      if (_canvas == null) {
+        throw new Error('please register a canvas');
+      }
+
+      return _canvas;
     } else if (tagName === 'img') {
       return new Image();
     } // else if (tagName === 'audio') {
@@ -1248,8 +1324,8 @@ var document$1 = {
     return text;
   },
   getElementById: function getElementById(id) {
-    if (id === _canvas.id) {
-      return _canvas;
+    if (_canvasMap.has(id)) {
+      return _canvasMap.get(id);
     }
 
     return null;
@@ -1262,7 +1338,7 @@ var document$1 = {
     } else if (tagName === 'body') {
       return [document$1.body];
     } else if (tagName === 'canvas') {
-      return [_canvas];
+      return _toConsumableArray(_canvasMap);
     }
 
     return [];
@@ -1276,7 +1352,7 @@ var document$1 = {
     } else if (tagName === 'body') {
       return [document$1.body];
     } else if (tagName === 'canvas') {
-      return [_canvas];
+      return _toConsumableArray(_canvasMap);
     }
 
     return [];
@@ -1288,8 +1364,12 @@ var document$1 = {
       return document$1.body;
     } else if (query === 'canvas') {
       return _canvas;
-    } else if (query === "#".concat(_canvas.id)) {
-      return _canvas;
+    } else {
+      var id = query.slice(1);
+
+      if (_canvasMap.has(id)) {
+        return _canvasMap.get(id);
+      }
     }
 
     return null;
@@ -1300,7 +1380,7 @@ var document$1 = {
     } else if (query === 'body') {
       return [document$1.body];
     } else if (query === 'canvas') {
-      return [_canvas];
+      return _toConsumableArray(_canvasMap);
     }
 
     return [];
@@ -1770,10 +1850,10 @@ function touchEventHandlerFactory(target, type) {
       event.currentTarget = document;
       document.dispatchEvent(event);
     } else {
-      var canvas = document.getElementsByTagName('canvas')[0];
-      event.target = canvas;
-      event.currentTarget = canvas;
-      canvas.dispatchEvent(event);
+      event.target = _canvas;
+      event.currentTarget = _canvas;
+
+      _canvas.dispatchEvent(event);
     }
   };
 } // const _setTimeout = setTimeout;
@@ -1796,4 +1876,4 @@ function removeEventListener(type, listener) {
   document.removeEventListener(type, listener);
 }
 
-export { AudioContext, Canvas, Element, HTMLElement, Image, TouchEvent, noop as VRFrameData, XMLHttpRequest, addEventListener, alert, blur, _canvas as canvas, devicePixelRatio, document$1 as document, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, removeEventListener, screen, scrollBy, scrollTo, scrollX, scrollY, touchEventHandlerFactory, webkitAudioContext };
+export { AudioContext, Element, HTMLElement, Image, TouchEvent, noop as VRFrameData, XMLHttpRequest, _canvasMap, addEventListener, alert, blur, _canvas as canvas, clearCanvas, devicePixelRatio, document$1 as document, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, registerCanvas, removeEventListener, screen, scrollBy, scrollTo, scrollX, scrollY, touchEventHandlerFactory, unregisterCanvas, webkitAudioContext };

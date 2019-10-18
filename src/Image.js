@@ -1,22 +1,22 @@
 import * as Mixin from './util/mixin'
 import HTMLImageElement from './HTMLImageElement'
-import Canvas from './Canvas'
+import { _canvas } from './Canvas'
 
-export default function() {
-    let canvas = new Canvas();
-    if (!canvas) {
-      throw new Error('global canvas need!')
-    }
-    const image = new Canvas().createImage();
+export default function Image() {
+	let canvas = _canvas;
+	if (!canvas) {
+		throw new Error('please register a canvas')
+	}
+	const image = canvas.createImage();
 
-    // image.__proto__.__proto__.__proto__ = new HTMLImageElement();
+	// image.__proto__.__proto__.__proto__ = new HTMLImageElement();
 
-    if (!('tagName' in image)) {
-        image.tagName = 'IMG'
-    }
+	if (!('tagName' in image)) {
+		image.tagName = 'IMG'
+	}
 
-    Mixin.parentNode(image);
-    Mixin.classList(image);
+	Mixin.parentNode(image);
+	Mixin.classList(image);
 
-    return image;
+	return image;
 };

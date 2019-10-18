@@ -1,7 +1,6 @@
 import { noop } from './util/index.js'
 
-import Canvas from './Canvas'
-import { _canvas } from './Canvas'// 暴露全局的 canvas
+import { _canvas, _canvasMap, registerCanvas, unregisterCanvas, clearCanvas } from './Canvas'// 暴露全局的 canvas
 
 import CommonComputedStyle from './style/CommonComputedStyle'
 import getImageComputedStyle from './style/ImageComputedStyle'
@@ -25,7 +24,7 @@ const { platform } = wx.getSystemInfoSync()
 
 
 // export { TouchEvent, PointerEvent, MouseEvent } from './EventIniter/index.js'
-import { TouchEvent, Touch} from './EventIniter/index.js'
+import { TouchEvent, Touch } from './EventIniter/index.js'
 
 
 // export { btoa, atob } from './Base64.js'
@@ -118,10 +117,9 @@ function touchEventHandlerFactory(target, type) {
             event.currentTarget = document
             document.dispatchEvent(event)
         } else {
-            let canvas = document.getElementsByTagName('canvas')[0]
-            event.target = canvas
-            event.currentTarget = canvas
-            canvas.dispatchEvent(event)
+            event.target = _canvas
+            event.currentTarget = _canvas
+            _canvas.dispatchEvent(event)
         }
     }
 }
@@ -146,7 +144,8 @@ function removeEventListener(type, listener) {
 export {
     // 暴露全局的 canvas
     _canvas as canvas,
-    Canvas,
+    _canvasMap,
+    registerCanvas, unregisterCanvas, clearCanvas,
 
     AudioContext,
     webkitAudioContext,

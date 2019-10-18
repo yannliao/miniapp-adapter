@@ -4,7 +4,7 @@ import HTMLElement from './HTMLElement'
 // import HTMLVideoElement from './HTMLVideoElement'
 import Image from './Image'
 // import Audio from './Audio'
-import Canvas from './Canvas'
+import { _canvas, _canvasMap } from './Canvas'
 import DocumentElement from './DocumentElement'
 import Body from './Body'
 import './EventIniter/index.js'
@@ -32,7 +32,10 @@ const document = {
     createElement(tagName) {
         tagName = tagName.toLowerCase();
         if (tagName === 'canvas') {
-            return new Canvas()
+            if (_canvas == null) {
+                throw new Error('please register a canvas')
+            }
+            return _canvas
         } else if (tagName === 'img') {
             return new Image()
         }
@@ -56,8 +59,8 @@ const document = {
     },
 
     getElementById(id) {
-        if (id === window.canvas.id) {
-            return window.canvas
+        if (_canvasMap.has(id)) {
+            return _canvasMap.get(id)
         }
         return null
     },
@@ -69,7 +72,7 @@ const document = {
         } else if (tagName === 'body') {
             return [document.body]
         } else if (tagName === 'canvas') {
-            return [window.canvas]
+            return [..._canvasMap]
         }
         return []
     },
@@ -84,7 +87,7 @@ const document = {
         } else if (tagName === 'body') {
             return [document.body]
         } else if (tagName === 'canvas') {
-            return [window.canvas]
+            return [..._canvasMap]
         }
         return []
     },
@@ -95,9 +98,12 @@ const document = {
         } else if (query === 'body') {
             return document.body
         } else if (query === 'canvas') {
-            return window.canvas
-        } else if (query === `#${window.canvas.id}`) {
-            return window.canvas
+            return _canvas
+        } else {
+            let id = query.slice(1)
+            if (_canvasMap.has(id)) {
+                return _canvasMap.get(id)
+            }
         }
         return null
     },
@@ -108,7 +114,7 @@ const document = {
         } else if (query === 'body') {
             return [document.body]
         } else if (query === 'canvas') {
-            return [window.canvas]
+            return [..._canvasMap]
         }
         return []
     },
