@@ -446,57 +446,6 @@ function (_Element) {
   return HTMLElement;
 }(Element);
 
-// import { HTMLCanvasElement, CanvasRenderingContext2D, WebGLRenderingContext } from './constructor'
-var _canvas = null;
-function Canvas(canvas) {
-  if (_canvas) {
-    return _canvas;
-  }
-
-  if (!canvas) {
-    throw new Error('need a canvas');
-  }
-
-  canvas.type = 'canvas';
-  canvas.style = {
-    width: canvas.width + 'px',
-    height: canvas.height + 'px'
-  };
-
-  canvas.focus = function () {};
-
-  canvas.blur = function () {};
-
-  canvas.addEventListener = function (type, listener) {
-    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
-    // console.log('canvas.addEventListener', type);
-    document$1.addEventListener(type, listener, options);
-  };
-
-  canvas.removeEventListener = function (type, listener) {
-    // console.log('canvas.removeEventListener', type);
-    document$1.removeEventListener(type, listener);
-  };
-
-  canvas.dispatchEvent = function () {
-    var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-    console.log('canvas.dispatchEvent', event.type, event); // nothing to do
-  };
-
-  canvas.getBoundingClientRect = function () {
-    var ret = {
-      top: 0,
-      left: 0,
-      width: innerWidth,
-      height: innerHeight
-    };
-    return ret;
-  };
-
-  _canvas = canvas;
-  return _canvas;
-}
-
 function Image () {
   var canvas = new Canvas();
 
@@ -704,6 +653,57 @@ if (wx.onHide) {
 
 if (wx.onShow) {
   wx.onShow(onVisibilityChange(true));
+}
+
+// import { HTMLCanvasElement, CanvasRenderingContext2D, WebGLRenderingContext } from './constructor'
+var _canvas = null;
+function Canvas(canvas) {
+  if (_canvas) {
+    return _canvas;
+  }
+
+  if (!canvas) {
+    throw new Error('need a canvas');
+  }
+
+  canvas.type = 'canvas';
+  canvas.style = {
+    width: canvas.width + 'px',
+    height: canvas.height + 'px'
+  };
+
+  canvas.focus = function () {};
+
+  canvas.blur = function () {};
+
+  canvas.addEventListener = function (type, listener) {
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    // console.log('canvas.addEventListener', type);
+    document$1.addEventListener(type, listener, options);
+  };
+
+  canvas.removeEventListener = function (type, listener) {
+    // console.log('canvas.removeEventListener', type);
+    document$1.removeEventListener(type, listener);
+  };
+
+  canvas.dispatchEvent = function () {
+    var event = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+    console.log('canvas.dispatchEvent', event.type, event); // nothing to do
+  };
+
+  canvas.getBoundingClientRect = function () {
+    var ret = {
+      top: 0,
+      left: 0,
+      width: innerWidth,
+      height: innerHeight
+    };
+    return ret;
+  };
+
+  _canvas = canvas;
+  return _canvas;
 }
 
 var style$1 = {
@@ -1713,7 +1713,7 @@ function eventHandlerFactory() {
     event.res = res;
     event.windowWidth = res.windowWidth;
     event.windowHeight = res.windowHeight;
-    document$1.dispatchEvent(event);
+    document.dispatchEvent(event);
   };
 }
 
@@ -1732,11 +1732,11 @@ var AudioContext = null;
 var webkitAudioContext = null;
 
 function addEventListener(type, listener) {
-  document$1.addEventListener(type, listener);
+  document.addEventListener(type, listener);
 }
 
 function removeEventListener(type, listener) {
-  document$1.removeEventListener(type, listener);
+  document.removeEventListener(type, listener);
 }
 
-export { AudioContext, Canvas, Element, HTMLElement, Image, noop as VRFrameData, XMLHttpRequest, addEventListener, alert, blur, _canvas as canvas, devicePixelRatio, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, removeEventListener, screen, scrollBy, scrollTo, scrollX, scrollY, webkitAudioContext };
+export { AudioContext, Canvas, Element, HTMLElement, Image, noop as VRFrameData, XMLHttpRequest, addEventListener, alert, blur, _canvas as canvas, devicePixelRatio, document$1 as document, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, removeEventListener, screen, scrollBy, scrollTo, scrollX, scrollY, webkitAudioContext };

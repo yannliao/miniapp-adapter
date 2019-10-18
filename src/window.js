@@ -1,5 +1,5 @@
 import { noop } from './util/index.js'
-import document from './document'
+
 import Canvas from './Canvas'
 import { _canvas } from './Canvas'// 暴露全局的 canvas
 
@@ -8,7 +8,7 @@ import getImageComputedStyle from './style/ImageComputedStyle'
 import getCanvasComputedStyle from './style/CanvasComputedStyle'
 import Event from './Event'
 
-
+export { default as document } from './document'
 export { default as navigator } from './navigator'
 export { default as XMLHttpRequest } from './XMLHttpRequest'
 export { default as Image } from './Image'
