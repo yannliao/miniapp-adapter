@@ -549,11 +549,14 @@ function unregisterCanvas(argu) {
     return _canvasMap["delete"](argu._canvasId);
   }
 
+  _canvas = null;
   return false;
 }
 
 function clearCanvas() {
   _canvasMap.clear();
+
+  _canvas = null;
 }
 
 var style$1 = {
