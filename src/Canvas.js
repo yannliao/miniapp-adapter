@@ -56,11 +56,13 @@ function unregisterCanvas(argu) {
     } else if (argu._canvasId) {
         return _canvasMap.delete(argu._canvasId)
     }
+    _canvas = null
     return false
 }
 
 function clearCanvas() {
     _canvasMap.clear()
+    _canvas = null
 }
 
 export { _canvas, registerCanvas, unregisterCanvas, clearCanvas, _canvasMap }
