@@ -128,8 +128,9 @@ function touchEventHandlerFactory(target, type) {
 // const _clearTimeout = clearTimeout;
 // const _setInterval = setInterval;
 // const _clearInterval = clearInterval;
-// const _requestAnimationFrame = requestAnimationFrame;
-// const _cancelAnimationFrame = cancelAnimationFrame;
+const _requestAnimationFrame = _canvas ? _canvas.requestAnimationFrame : noop
+
+const _cancelAnimationFrame = _canvas ? _canvas.cancelAnimationFrame : noop
 
 //TODO
 let AudioContext = null
@@ -163,10 +164,10 @@ export {
 
     touchEventHandlerFactory,
     TouchEvent,
+    _requestAnimationFrame as requestAnimationFrame,
+    _cancelAnimationFrame as cancelAnimationFrame,
     // _setTimeout as setTimeout,
     // _clearTimeout as clearTimeout,
     // _setInterval as setInterval,
     // _clearInterval as clearInterval,
-    // _requestAnimationFrame as requestAnimationFrame,
-    // _cancelAnimationFrame as cancelAnimationFrame
 }

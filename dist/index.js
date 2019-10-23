@@ -1863,9 +1863,11 @@ function touchEventHandlerFactory(target, type) {
 // const _clearTimeout = clearTimeout;
 // const _setInterval = setInterval;
 // const _clearInterval = clearInterval;
-// const _requestAnimationFrame = requestAnimationFrame;
-// const _cancelAnimationFrame = cancelAnimationFrame;
-//TODO
+
+
+var _requestAnimationFrame = _canvas ? _canvas.requestAnimationFrame : noop;
+
+var _cancelAnimationFrame = _canvas ? _canvas.cancelAnimationFrame : noop; //TODO
 
 
 var AudioContext = null;
@@ -1879,4 +1881,4 @@ function removeEventListener(type, listener) {
   document.removeEventListener(type, listener);
 }
 
-export { AudioContext, Element, HTMLElement, Image, TouchEvent, noop as VRFrameData, XMLHttpRequest, _canvasMap, addEventListener, alert, blur, _canvas as canvas, clearCanvas, devicePixelRatio, document$1 as document, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, registerCanvas, removeEventListener, screen, scrollBy, scrollTo, scrollX, scrollY, touchEventHandlerFactory, unregisterCanvas, webkitAudioContext };
+export { AudioContext, Element, HTMLElement, Image, TouchEvent, noop as VRFrameData, XMLHttpRequest, _canvasMap, addEventListener, alert, blur, _cancelAnimationFrame as cancelAnimationFrame, _canvas as canvas, clearCanvas, devicePixelRatio, document$1 as document, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, registerCanvas, removeEventListener, _requestAnimationFrame as requestAnimationFrame, screen, scrollBy, scrollTo, scrollX, scrollY, touchEventHandlerFactory, unregisterCanvas, webkitAudioContext };
