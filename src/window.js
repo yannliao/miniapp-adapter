@@ -141,6 +141,8 @@ function addEventListener(type, listener) {
 function removeEventListener(type, listener) {
     document.removeEventListener(type, listener)
 }
+const arrayBufferToBase64 = wx.arrayBufferToBase64 || noop
+const base64ToArrayBuffer = wx.base64ToArrayBuffer || noop
 
 export {
     // 暴露全局的 canvas
@@ -166,6 +168,8 @@ export {
     TouchEvent,
     _requestAnimationFrame as requestAnimationFrame,
     _cancelAnimationFrame as cancelAnimationFrame,
+    arrayBufferToBase64,
+    base64ToArrayBuffer
     // _setTimeout as setTimeout,
     // _clearTimeout as clearTimeout,
     // _setInterval as setInterval,

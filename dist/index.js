@@ -1881,4 +1881,7 @@ function removeEventListener(type, listener) {
   document.removeEventListener(type, listener);
 }
 
-export { AudioContext, Element, HTMLElement, Image, TouchEvent, noop as VRFrameData, XMLHttpRequest, _canvasMap, addEventListener, alert, blur, _cancelAnimationFrame as cancelAnimationFrame, _canvas as canvas, clearCanvas, devicePixelRatio, document$1 as document, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, registerCanvas, removeEventListener, _requestAnimationFrame as requestAnimationFrame, screen, scrollBy, scrollTo, scrollX, scrollY, touchEventHandlerFactory, unregisterCanvas, webkitAudioContext };
+var arrayBufferToBase64 = wx.arrayBufferToBase64 || noop;
+var base64ToArrayBuffer = wx.base64ToArrayBuffer || noop;
+
+export { AudioContext, Element, HTMLElement, Image, TouchEvent, noop as VRFrameData, XMLHttpRequest, _canvasMap, addEventListener, alert, arrayBufferToBase64, base64ToArrayBuffer, blur, _cancelAnimationFrame as cancelAnimationFrame, _canvas as canvas, clearCanvas, devicePixelRatio, document$1 as document, focus, getComputedStyle, innerHeight, innerWidth, location, navigator, ontouchend, ontouchmove, ontouchstart, performance$1 as performance, registerCanvas, removeEventListener, _requestAnimationFrame as requestAnimationFrame, screen, scrollBy, scrollTo, scrollX, scrollY, touchEventHandlerFactory, unregisterCanvas, webkitAudioContext };
