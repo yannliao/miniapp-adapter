@@ -36,11 +36,13 @@ function registerCanvas(...argus) {
     if (_canvasMap.has(id)) {
         _canvas = _canvasMap.get(id)
     } else {
-        canvas.type = 'canvas';
         let element = new HTMLElement('canvas')
-        Mixin.copyProperties(canvas, element); // 拷贝实例属性
-        Mixin.copyProperties(canvas.constructor.prototype, EventTarget.prototype); // 拷贝EventTarget原型属性
-        Mixin.copyProperties(canvas.constructor.prototype, HTMLElement.prototype); // 拷贝HTMLElement原型属性
+        if (!canvas.tagName || canvas.tagName.toUpperCase() != 'CANVAS') {
+            canvas.type = 'canvas';
+            Mixin.copyProperties(canvas, element); // 拷贝实例属性
+            Mixin.copyProperties(canvas.constructor.prototype, EventTarget.prototype); // 拷贝EventTarget原型属性
+            Mixin.copyProperties(canvas.constructor.prototype, HTMLElement.prototype); // 拷贝HTMLElement原型属性
+        }
         _canvasMap.set(id, canvas)
         _canvas = canvas
     }
